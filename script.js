@@ -1,5 +1,7 @@
 let alunosDisponiveis = [];
 let alunosExcluidos = [];
+let historicoDeSorteios = [];
+
 function sortearAlunos() {
   fetch('arquivo.csv')
     .then(response => response.text())
@@ -24,7 +26,7 @@ function sortearAlunos() {
         grupos.push(['Alunos Excluídos', ...alunosExcluidos]);
       }
 
-      exibirGrupos(grupos);
+      atualizarGrupos(grupos);
     });
 }
 
@@ -109,9 +111,12 @@ function atualizarGrupos(grupos) {
           indiceInicial += tamanhoGrupo;
         }
 
-        if (alunosExcluidos.length > 0) {
-          grupos.push(['Alunos Excluídos', ...alunosExcluidos]);
-        }
+       if (alunosExcluidos.length > 0) {
+      grupos.push(['Alunos Excluídos', ...alunosExcluidos]);
+    }
+
+        // Adicionar os grupos atuais ao histórico de sorteios
+        historicoDeSorteios.push(grupos);
 
         exibirGrupos(grupos);
       });
@@ -119,26 +124,51 @@ function atualizarGrupos(grupos) {
     if (alunosExcluidos.length > 0) {
       grupos.push(['Alunos Excluídos', ...alunosExcluidos]);
     }
+
+    // Adicionar os grupos atuais ao histórico de sorteios
+    historicoDeSorteios.push(grupos);
+
     exibirGrupos(grupos);
   }
 }
 
-function salvarTxt() {
-    const gruposHtml = document.getElementById('grupos').innerHTML
-                        .replace(/<h2>/g, '')
-                        .replace(/<\/h2>/g, '')
-                        .replace(/<p>/g, '')
-                        .replace(/<\/p>/g, '');
+function exibirHistoricoDeSorteios() {
+  let resultado = '';
+  historicoDeSorteios.forEach((sorteio, index) => {
+    resultado += `<h2>Sorteio ${index + 1}</h2>`;
+    sorteio.forEach((grupo, indice) => {
+      if (grupo[0] === 'Alunos Excluídos') {
+        resultado += `<h3>Alunos Excluídos</h3>`;
+        grupo.slice(1).forEach(aluno => {
+          resultado += `<p>${aluno}</p>`;
+        });
+      } else {
+        resultado += `<h3>Grupo ${indice + 1}</h3>`;
+        grupo.forEach(aluno => {
+          resultado += `<p>${aluno}</p>`;
+        });
+      }
+    });
+  });
+  document.getElementById('historico').innerHTML = resultado;
+}
 
-    const nomes = gruposHtml.trim().split('\n');
-    nomes.sort();
-    const textoFormatado = nomes.join('\n');
-    const blob = new Blob([textoFormatado], { type: 'text/plain' });
-    const fileName = 'resultado_sorteio.txt';
-    const link = document.createElement('a');
-    link.download = fileName;
-    link.href = window.URL.createObjectURL(blob);
-    link.click();
+function salvarTxt() {
+  const gruposHtml = document.getElementById('grupos').innerHTML
+    .replace(/<h2>/g, '\n')
+    .replace(/<\/h2>/g, '\n')
+    .replace(/<p>/g, '')
+    .replace(/<\/p>/g, '\n')
+    .trim();
+
+  const nomes = gruposHtml.split('\n').filter(line => line !== '');
+  const textoFormatado = nomes.join('\n');
+  const blob = new Blob([textoFormatado], { type: 'text/plain' });
+  const fileName = 'resultado_sorteio.txt';
+  const link = document.createElement('a');
+  link.download = fileName;
+  link.href = window.URL.createObjectURL(blob);
+  link.click();
 }
 
 sortearAlunos();
