@@ -28,4 +28,4 @@ Aplicação web leve para execução de sorteios aleatórios, justos e auditáve
 
 ## Licença
 
-MIT © [Felipe Madson](https://github.com/FelipeMadson)
+MIT © [Felipe Madison](https://github.com/FelipeMadson)
