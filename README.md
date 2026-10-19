@@ -28,4 +28,4 @@ A fast, client-side web application for running verifiable, unbiased random part
 
 ## License
 
-MIT © [Felipe Madson](https://github.com/FelipeMadson)
+MIT © [Felipe Madison](https://github.com/FelipeMadson)
